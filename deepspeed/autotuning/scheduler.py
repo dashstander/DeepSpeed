@@ -96,6 +96,8 @@ class ResourceManager:
         exp_id = exp["exp_id"]
         exp["master_port"] = self.args.master_port + exp_id
         exp["result_dir"] = os.path.join(self.results_dir, exp['name'])
+        exp["hostfile"] = self.args.hostfile
+        exp["launcher"] = self.args.launcher
         user_script = self.args.user_script
         user_args = self.args.user_args
 
@@ -324,12 +326,15 @@ def run_experiment(exp: dict, reservations, user_script, user_args):
         include_str += f"{reservation.node.host}:{slots}@"
     include_str = include_str[:-1]
     master_port = exp["master_port"]
+    hostfile = exp["hostfile"]
     exp["launcher_args"] = [
         "--include",
         f"{include_str}",
         "--master_port",
         str(master_port),
     ]
+    if hostfile != '':
+        exp["launcher_args"] += ["--hostfile", hostfile]
     logger.debug(f'launcher args={exp["launcher_args"]}')
 
     exp["user"] = get_user()
@@ -385,7 +390,7 @@ def run_experiment(exp: dict, reservations, user_script, user_args):
         err.flush()
         os.fsync(out)
         os.fsync(err)
-
+    
     clean_up(exp, reservations)
 
     logger.info(f"Done running exp_id = {exp['exp_id']}, exp_name = {exp['name']}")
@@ -395,6 +400,9 @@ PDSH_MAX_FAN_OUT = 1024
 
 
 def clean_up(exp: dict, reservations):
+    if exp['launcher'] == 'slurm':
+        return
+        
     env = os.environ.copy()
     env['PDSH_RCMD_TYPE'] = 'ssh'
 
