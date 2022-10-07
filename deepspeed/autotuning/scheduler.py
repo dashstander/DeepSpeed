@@ -332,6 +332,8 @@ def run_experiment(exp: dict, reservations, user_script, user_args):
         f"{include_str}",
         "--master_port",
         str(master_port),
+        "--launcher",
+        exp["launcher"],
     ]
     if hostfile != '':
         exp["launcher_args"] += ["--hostfile", hostfile]
@@ -402,7 +404,7 @@ PDSH_MAX_FAN_OUT = 1024
 def clean_up(exp: dict, reservations):
     if exp['launcher'] == 'slurm':
         return
-        
+
     env = os.environ.copy()
     env['PDSH_RCMD_TYPE'] = 'ssh'
 
