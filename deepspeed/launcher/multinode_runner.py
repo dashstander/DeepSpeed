@@ -198,7 +198,7 @@ class SlurmRunner(MultiNodeRunner):
             f'{total_process_count}',
         ]
 
-        if getattr(self.args, 'slurm_comment', ''):
+        if getattr(self.args, 'comment', ''):
             srun_cmd += ['--comment', self.args.slurm_comment]
 
         if self.args.include != "":
