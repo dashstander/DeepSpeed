@@ -98,8 +98,8 @@ class ResourceManager:
         exp["result_dir"] = os.path.join(self.results_dir, exp['name'])
         exp["hostfile"] = self.args.hostfile
         exp["launcher"] = self.args.launcher
-        if self.args.launcher == 'slurm' and hasattr(self.args, 'slurm_comment'):
-            exp["comment"] = self.args.slurm_comment
+        if self.args.launcher == 'slurm' and hasattr(self.args, 'comment'):
+            exp["comment"] = self.args.comment
         user_script = self.args.user_script
         user_args = self.args.user_args
 

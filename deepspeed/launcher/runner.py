@@ -161,6 +161,13 @@ def parse_args(args=None):
         help="Run DeepSpeed autotuner to discover optimal configuration parameters "
         "before running job.")
 
+    parser.add_argument(
+        "--comment",
+        default="",
+        type=str,
+        help="A comment that can be used for metadata."
+    )
+
     parser.add_argument("--elastic_training",
                         action="store_true",
                         help="Enable elastic training support in DeepSpeed.")
