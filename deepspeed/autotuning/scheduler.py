@@ -98,6 +98,8 @@ class ResourceManager:
         exp["result_dir"] = os.path.join(self.results_dir, exp['name'])
         exp["hostfile"] = self.args.hostfile
         exp["launcher"] = self.args.launcher
+        if self.args.launcher == 'slurm' and hasattr(self.args, 'slurm_comment'):
+            exp["comment"] = self.args.slurm_comment
         user_script = self.args.user_script
         user_args = self.args.user_args
 
@@ -337,6 +339,8 @@ def run_experiment(exp: dict, reservations, user_script, user_args):
     ]
     if hostfile != '':
         exp["launcher_args"] += ["--hostfile", hostfile]
+    if 'comment' in exp:
+        exp["launcher_args"] += ["--comment", exp["comment"]]
     logger.debug(f'launcher args={exp["launcher_args"]}')
 
     exp["user"] = get_user()
