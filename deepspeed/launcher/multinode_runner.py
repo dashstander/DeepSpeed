@@ -199,7 +199,7 @@ class SlurmRunner(MultiNodeRunner):
         ]
 
         if getattr(self.args, 'comment', ''):
-            srun_cmd += ['--comment', self.args.slurm_comment]
+            srun_cmd += ['--comment', self.args.comment]
 
         if self.args.include != "":
             srun_cmd.append('--include')
