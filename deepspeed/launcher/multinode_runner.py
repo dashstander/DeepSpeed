@@ -189,6 +189,17 @@ class SlurmRunner(MultiNodeRunner):
             user_args.append(arg)
         return user_args
 
+    @staticmethod
+    def _pdsh_include_to_nodelist(include_string: str):
+        """If an `--include` string of the form `node1@node2` has been passed in, transforms it to a format SLURM will accept."""
+        NODE_SEP = '@'
+        SLOT_LIST_START = ':'
+        if NODE_SEP not in include_string:
+            return include_string
+        if SLOT_LIST_START in include_string:
+            raise NotImplementedError('Currently only allocating whole nodes is supported while using the SLURM launcher.')
+        return include_string.replace(NODE_SEP, ',')
+
     def get_cmd(self, environment, active_resources):
         assert not getattr(self.args, 'detect_nvlink_pairs', False), "slurm backend does not support remapping visible devices"
         total_process_count = sum(self.resource_pool.values())
@@ -202,11 +213,8 @@ class SlurmRunner(MultiNodeRunner):
             srun_cmd += ['--comment', self.args.comment]
 
         if self.args.include != "":
-            srun_cmd.append('--include')
-            srun_cmd.append(f'{self.args.include}')
-        if self.args.exclude != "":
-            srun_cmd.append('--exclude')
-            srun_cmd.append(f'{self.args.exclude}')
+            srun_cmd.append('--nodelist')
+            srun_cmd.append(self._pdsh_include_to_nodelist(self.args.include)) 
         if self.args.num_nodes > 0:
             srun_cmd.append('--nodes')
             srun_cmd.append(f'{self.args.num_nodes}')
