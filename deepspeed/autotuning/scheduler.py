@@ -330,20 +330,19 @@ def run_experiment(exp: dict, reservations, user_script, user_args):
     include_str = include_str[:-1]
     master_port = exp["master_port"]
     hostfile = exp["hostfile"]
+    launcher_args = ["--launcher", exp["launcher"]]
     if exp["launcher"] not in (MVAPICH_LAUNCHER, OPENMPI_LAUNCHER, SLURM_LAUNCHER):
-        exp["launcher_args"] = [
+        launcher_args += [
             "--include",
             f"{include_str}",
             "--master_port",
             str(master_port),
         ]
-    else:
-        exp["launcher_args"] = []
-    logger.debug(f'launcher args={exp["launcher_args"]}')
     if hostfile != '':
-        exp["launcher_args"] += ["--hostfile", hostfile]
+        launcher_args += ["--hostfile", hostfile]
     if 'comment' in exp:
-        exp["launcher_args"] += ["--comment", exp["comment"]]
+        launcher_args += ["--comment", exp["comment"]]
+    exp["launcher_args"] = launcher_args
     logger.debug(f'launcher args={exp["launcher_args"]}')
 
     exp["user"] = get_user()
