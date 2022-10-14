@@ -330,14 +330,16 @@ def run_experiment(exp: dict, reservations, user_script, user_args):
     include_str = include_str[:-1]
     master_port = exp["master_port"]
     hostfile = exp["hostfile"]
-    exp["launcher_args"] = [
-        "--include",
-        f"{include_str}",
-        "--master_port",
-        str(master_port),
-        "--launcher",
-        exp["launcher"],
-    ]
+    if exp["launcher"] not in (MVAPICH_LAUNCHER, OPENMPI_LAUNCHER, SLURM_LAUNCHER):
+        exp["launcher_args"] = [
+            "--include",
+            f"{include_str}",
+            "--master_port",
+            str(master_port),
+        ]
+    else:
+        exp["launcher_args"] = []
+    logger.debug(f'launcher args={exp["launcher_args"]}')
     if hostfile != '':
         exp["launcher_args"] += ["--hostfile", hostfile]
     if 'comment' in exp:
@@ -375,17 +377,6 @@ def run_experiment(exp: dict, reservations, user_script, user_args):
 
     exp["user_script"] = user_script
     exp["user_args"] = user_args
-
-    if exp["launcher"] not in (MVAPICH_LAUNCHER, OPENMPI_LAUNCHER, SLURM_LAUNCHER):
-        exp["launcher_args"] = [
-            "--include",
-            f"{include_str}",
-            "--master_port",
-            str(master_port),
-        ]
-    else:
-        exp["launcher_args"] = []
-    logger.debug(f'launcher args={exp["launcher_args"]}')
 
     cmd = ["deepspeed"] + exp["launcher_args"] + [user_script] + user_args
 
