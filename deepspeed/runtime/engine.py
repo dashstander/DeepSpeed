@@ -1678,11 +1678,13 @@ class DeepSpeedEngine(Module):
         if self.autotuning_profile_model_info():
             activation_mem = get_ma_status() - ma
             self.autotuning_model_info["activation_mem_per_gpu"] = activation_mem
+            print(self.autotuning_model_info)
             print_json_dist(self.autotuning_model_info,
                             [0],
                             path=self.autotuning_model_info_path())
             exit()
         else:
+            print('autotuning_profile_model_info() is False')
             see_memory_usage("Engine after forward", force=self.memory_breakdown())
         return loss
 
@@ -2044,6 +2046,7 @@ class DeepSpeedEngine(Module):
 
         if self.autotuning_enabled() and self.global_steps == (
                 self.autotuning_end_profile_step() + 1):
+            print(f'Exiting auotuning')
             self._autotuning_exit()
 
         if self.wall_clock_breakdown():
