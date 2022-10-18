@@ -707,6 +707,8 @@ class Autotuner:
             with open(model_info_path, 'r') as f:
                 model_info = hjson.load(f)
                 return model_info
+        else:
+            print(f'Could not find model_info at {model_info_path}')
 
     def update_records(self, space_name, exp, metric_val, num_exps):
         if space_name not in self.records:
