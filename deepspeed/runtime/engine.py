@@ -576,6 +576,9 @@ class DeepSpeedEngine(Module):
         return self._config.autotuning_config.metric
 
     def autotuning_profile_model_info(self):
+        print(f'Autotuning enabled: {self.autotuning_enabled()}')
+        print(f'Model info: {self._config.autotuning_config.model_info}')
+        print(self._config.autotuning_config.model_info)
         return self.autotuning_enabled(
         ) and self._config.autotuning_config.model_info and self._config.autotuning_config.model_info.get(
             "profile",
@@ -1684,7 +1687,6 @@ class DeepSpeedEngine(Module):
                             path=self.autotuning_model_info_path())
             exit()
         else:
-            print('autotuning_profile_model_info() is False')
             see_memory_usage("Engine after forward", force=self.memory_breakdown())
         return loss
 
