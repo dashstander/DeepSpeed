@@ -578,7 +578,7 @@ class DeepSpeedEngine(Module):
     def autotuning_profile_model_info(self):
         print(f'Autotuning enabled: {self.autotuning_enabled()}')
         print(f'Model info: {self._config.autotuning_config.model_info}')
-        print(self._config.autotuning_config.model_info)
+        print(self._config)
         return self.autotuning_enabled(
         ) and self._config.autotuning_config.model_info and self._config.autotuning_config.model_info.get(
             "profile",
@@ -894,6 +894,7 @@ class DeepSpeedEngine(Module):
             self.config = (args.deepspeed_config
                            if hasattr(args,
                                       "deepspeed_config") else None)
+        print(self.config)
         self._config = DeepSpeedConfig(self.config, mpu)
 
     # Validate command line arguments
