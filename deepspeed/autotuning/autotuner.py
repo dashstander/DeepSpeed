@@ -1070,7 +1070,7 @@ class Autotuner:
     def run_ds_config(self, ds_config, exp_name):
         exp_config = {}
         exp_config['name'] = exp_name
-        exp_config[DS_CONFIG] = ds_config
+        exp_config[DS_CONFIG] = ds_config.dict()
         exp_config['num_gpus'] = self.exp_num_gpus
         exp_config['num_nodes'] = self.exp_num_nodes
         exp_path = os.path.join(self.exps_dir, f'{exp_name}.json')
@@ -1078,7 +1078,7 @@ class Autotuner:
         logger.debug(f'run_ds_config exp_name = {exp_name}')
 
         with open(exp_path, 'w', buffering=BUFSIZE) as fd:
-            json.dump(exp_config.dict(), fd)
+            json.dump(exp_config, fd)
             fd.flush()
             os.fsync(fd)
 
