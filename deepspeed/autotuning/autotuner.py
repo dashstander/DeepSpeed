@@ -500,7 +500,7 @@ class Autotuner:
                    prev_best_mbs=0,
                    prev_best_metric_val=0):
         config_zero = tuning_space.get(ZERO_OPTIMIZATION, {})
-        stage = config_zero.stage
+        stage = config_zero.get("stage")
         tuning_space_name = TUNING_MICRO_BATCH_SIZE_PREFIX + str(stage)
         tuning_micro_batch_sizes = []
         max_train_batch_size_per_gpu = 0
