@@ -756,7 +756,7 @@ class Autotuner:
         max_micro_batch_size_metric_val = 0
 
         ds_config = get_first_config(self.user_config)
-        ds_config[ZERO_OPTIMIZATION] = DeepSpeedZeroConfig(stage=stage)
+        ds_config[ZERO_OPTIMIZATION] = DeepSpeedZeroConfig(stage=stage).dict()
         tuning_space_name = TUNING_MICRO_BATCH_SIZE_PREFIX + str(stage)
 
         exp_paths = []
@@ -855,7 +855,7 @@ class Autotuner:
         tuning_space_name = TUNING_MICRO_BATCH_SIZE_PREFIX + str(stage)
 
         ds_config = get_first_config(self.user_config)
-        ds_config[ZERO_OPTIMIZATION] = DeepSpeedZeroConfig(stage=stage)
+        ds_config[ZERO_OPTIMIZATION] = DeepSpeedZeroConfig(stage=stage).dict()
         gas = self.get_gas_from_user_config()
         ds_config[GRADIENT_ACCUMULATION_STEPS] = gas
 

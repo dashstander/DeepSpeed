@@ -7,7 +7,7 @@ from pydantic import Field, validator
 import sys
 from typing import Optional
 from enum import Enum
-from deepspeed.runtime.config_utils import get_scalar_param, DeepSpeedConfigModel, DeepSpeedConfigObject
+from deepspeed.runtime.config_utils import get_scalar_param, DeepSpeedConfigModel
 from deepspeed.utils import logger
 from .offload_config import DeepSpeedZeroOffloadParamConfig, DeepSpeedZeroOffloadOptimizerConfig, OffloadDeviceEnum
 
@@ -74,7 +74,7 @@ class ZeroStageEnum(int, Enum):
     max_stage = 3
 
 
-class DeepSpeedZeroConfig(DeepSpeedConfigModel, DeepSpeedConfigObject):
+class DeepSpeedZeroConfig(DeepSpeedConfigModel):
     stage: ZeroStageEnum = ZeroStageEnum.disabled
     contiguous_gradients: bool = True
     reduce_scatter: bool = True
