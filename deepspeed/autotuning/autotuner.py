@@ -1,6 +1,5 @@
 import shutil
 import subprocess
-from deepspeed.runtime.config import DeepSpeedConfig
 import torch
 import time
 import datetime
@@ -416,8 +415,9 @@ class Autotuner:
         logger.info(
             f"The model requires at least {memory_to_string(self.activation_mem, postfix='B')} activation memory for micro batch size 1."
         )
-        ds_config = DeepSpeedConfig(self.user_config)
-        stage = ds_config.zero_optimization.stage if 'stage' in ds_config.zero_optimization.__fields_set__ else "all"
+
+        zero = self.user_config.get('zero_optimization', {})
+        stage = zero.get("stage", "all")
         user_zero_stages = [stage] if not isinstance(stage, list) else stage
         logger.info(f"User-defined zero stages are {stage}.")
 
