@@ -1078,7 +1078,7 @@ class Autotuner:
         logger.debug(f'run_ds_config exp_name = {exp_name}')
 
         with open(exp_path, 'w', buffering=BUFSIZE) as fd:
-            json.dump(exp_config, fd)
+            json.dump(exp_config.dict(), fd)
             fd.flush()
             os.fsync(fd)
 
