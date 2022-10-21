@@ -521,6 +521,7 @@ def _pool_flops_compute(
     padding=0,
     dilation=1,
     ceil_mode=False,
+    return_indices=False,
     count_include_pad=True,
     divisor_override=None,
 ):
