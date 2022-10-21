@@ -519,6 +519,7 @@ def _pool_flops_compute(
     kernel_size,
     stride=None,
     padding=0,
+    dilation=1,
     ceil_mode=False,
     count_include_pad=True,
     divisor_override=None,
