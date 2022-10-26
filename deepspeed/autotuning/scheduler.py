@@ -421,6 +421,8 @@ def clean_up(exp: dict, reservations):
 
     if exp['launcher'] == 'slurm':
         runner_cmd = ['srun', '-w', nodes_str]
+        if 'comment' in exp:
+            runner_cmd += ['--comment', exp['comment']]
     else:
         # PDSH flags for max node fan out and specific hosts to launch on
         # See https://linux.die.net/man/1/pdsh for flag details
