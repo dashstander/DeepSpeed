@@ -408,9 +408,6 @@ PDSH_MAX_FAN_OUT = 1024
 
 
 def clean_up(exp: dict, reservations):
-    if exp['launcher'] == 'slurm':
-        return
-
     env = os.environ.copy()
     env['PDSH_RCMD_TYPE'] = 'ssh'
 
@@ -421,16 +418,20 @@ def clean_up(exp: dict, reservations):
     logger.debug(
         f"Cleaning up exp_id = {exp['exp_id']} on the following workers: {nodes_str}")
 
-    # PDSH flags for max node fan out and specific hosts to launch on
-    # See https://linux.die.net/man/1/pdsh for flag details
-    pdsh_cmd = ['pdsh', '-f', str(PDSH_MAX_FAN_OUT), '-w', nodes_str]
+
+    if exp['launcher'] == 'slurm':
+        runner_cmd = ['srun', '-w', nodes_str]
+    else:
+        # PDSH flags for max node fan out and specific hosts to launch on
+        # See https://linux.die.net/man/1/pdsh for flag details
+        runner_cmd = ['pdsh', '-f', str(PDSH_MAX_FAN_OUT), '-w', nodes_str]
 
     kill_cmd = [
         'pkill',
         '-f',
         exp['name'],
     ]
-    cmd = pdsh_cmd + kill_cmd
+    cmd = runner_cmd + kill_cmd
     logger.debug("cmd = {}".format(' '.join(cmd)))
 
     result = subprocess.Popen(cmd, env=env)
