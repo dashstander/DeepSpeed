@@ -199,6 +199,9 @@ class SlurmRunner(MultiNodeRunner):
         if SLOT_LIST_START in include_string:
             raise NotImplementedError('Currently only allocating whole nodes is supported while using the SLURM launcher.')
         return include_string.replace(NODE_SEP, ',')
+    @property
+    def name(self):
+        return 'slurm'
 
     def get_cmd(self, environment, active_resources):
         assert not getattr(self.args, 'detect_nvlink_pairs', False), "slurm backend does not support remapping visible devices"
@@ -215,6 +218,8 @@ class SlurmRunner(MultiNodeRunner):
         if self.args.include != "":
             srun_cmd.append('--nodelist')
             srun_cmd.append(self._pdsh_include_to_nodelist(self.args.include)) 
+            srun_cmd += ['--comment', self.args.slurm_comment]
+
         if self.args.num_nodes > 0:
             srun_cmd.append('--nodes')
             srun_cmd.append(f'{self.args.num_nodes}')
