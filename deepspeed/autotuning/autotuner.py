@@ -527,9 +527,12 @@ class Autotuner:
 
         # calculate max micro batch size using gpu memory, model instantiation memory and activation memory
         # calculated_max_micro_batch_size = (memory_per_gpu - instantiation_memory) // activation_memory_micro_batch_size_1
+        logger.info(f'GPU memory: {self.gpu_mem}')
+        logger.info(f'Instantiation mem required for stage {stage}: {self.get_instantiation_memory_required_per_gpu(stage)}')
+        logger.info(f'Activation mem: {self.activation_mem}')
         calculated_max_micro_batch_size = int(
-            self.gpu_mem -
-            self.get_instantiation_memory_required_per_gpu(stage)) // self.activation_mem
+            (self.gpu_mem -
+            self.get_instantiation_memory_required_per_gpu(stage))) // self.activation_mem
         logger.info(
             f"Start tuning for space {tuning_space_name}, calculated_max_micro_batch_size = {calculated_max_micro_batch_size}"
         )
