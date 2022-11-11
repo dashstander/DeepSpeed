@@ -1072,13 +1072,13 @@ class PipelineEngine(DeepSpeedEngine):
 
         if isinstance(inputs, torch.Tensor):
             assert inputs.grad is not None
-            p2p.send(inputs.grad, self.prev_stage, fp32_comm=self.allreduce_always_fp32())
+            p2p.send(inputs.grad, self.prev_stage)
         else:
             # XXX terrible hacky branch
             if self.is_grad_partitioned:
                 # First two sends are partitioned gradient
-                p2p.send(inputs[0], self.prev_stage, fp32_comm=self.allreduce_always_fp32())
-                p2p.send(inputs[1], self.prev_stage, fp32_comm=self.allreduce_always_fp32())
+                p2p.send(inputs[0], self.prev_stage)
+                p2p.send(inputs[1], self.prev_stage)
                 # XXX hack hack hack
                 # p2p.send(inputs[2].grad, self.prev_stage)
             else:
@@ -1088,7 +1088,7 @@ class PipelineEngine(DeepSpeedEngine):
                         assert buffer.grad is None
                         continue
                     assert buffer.grad is not None
-                    p2p.send(buffer.grad, self.prev_stage, fp32_comm=self.allreduce_always_fp32())
+                    p2p.send(buffer.grad, self.prev_stage)
 
         # We can free up the input buffer now
         self.pipe_buffers['inputs'][buffer_id] = None
