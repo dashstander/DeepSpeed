@@ -980,6 +980,9 @@ class PipelineEngine(DeepSpeedEngine):
         if self.wall_clock_breakdown():
             self.timers('pipe_send_output').stop()
 
+
+    """
+
     def _exec_send_grads(self, buffer_id):
         if self.wall_clock_breakdown():
             self.timers('pipe_send_grad').start()
@@ -1032,6 +1035,60 @@ class PipelineEngine(DeepSpeedEngine):
                         continue
                     assert buffer.grad is not None
                     p2p.send(buffer.grad, self.prev_stage)
+
+        # We can free up the input buffer now
+        self.pipe_buffers['inputs'][buffer_id] = None
+
+        if self.wall_clock_breakdown():
+            self.timers('pipe_send_grad').stop()
+
+    """
+
+    def _exec_send_grads(self, buffer_id):
+        if self.wall_clock_breakdown():
+            self.timers('pipe_send_grad').start()
+
+        inputs = self.pipe_buffers['inputs'][buffer_id]
+
+        # Partition the gradient
+        if self.is_grad_partitioned:
+            part = PartitionedTensor(tensor=inputs[0].grad,
+                                     group=self.grid.get_slice_parallel_group())
+            # Clear the large output data, but save the computation graph
+            # Inject the partitoned tensor into the output before sending
+
+            # XXX Hack
+            inputs = tuple([part.to_meta(), part.data(), inputs[1]])
+
+        # XXX Terrible hack
+        # Drop the attention mask from the input buffer here. It does not have
+        # a grad that needs to be communicated. We free the buffer immediately
+        # after, so no need to restore it. The receiver also has a hack that skips
+        # the recv. This is because NCCL does not let us send torch.BoolTensor :-(.
+        if self.has_attention_mask:
+            inputs = list(inputs)
+            inputs.pop()
+            inputs = tuple(inputs)
+
+        if isinstance(inputs, torch.Tensor):
+            assert inputs.grad is not None
+            p2p.send(inputs.grad, self.prev_stage, fp32_comm=self.allreduce_always_fp32())
+        else:
+            # XXX terrible hacky branch
+            if self.is_grad_partitioned:
+                # First two sends are partitioned gradient
+                p2p.send(inputs[0], self.prev_stage, fp32_comm=self.allreduce_always_fp32())
+                p2p.send(inputs[1], self.prev_stage, fp32_comm=self.allreduce_always_fp32())
+                # XXX hack hack hack
+                # p2p.send(inputs[2].grad, self.prev_stage)
+            else:
+                for idx, buffer in enumerate(inputs):
+                    # Skip tensors that will not produce a grad
+                    if not buffer.is_floating_point():
+                        assert buffer.grad is None
+                        continue
+                    assert buffer.grad is not None
+                    p2p.send(buffer.grad, self.prev_stage, fp32_comm=self.allreduce_always_fp32())
 
         # We can free up the input buffer now
         self.pipe_buffers['inputs'][buffer_id] = None
