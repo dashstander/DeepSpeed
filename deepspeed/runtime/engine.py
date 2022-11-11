@@ -573,23 +573,19 @@ class DeepSpeedEngine(Module):
         return path
 
     def autotuning_model_info_path(self):
-        #path = self._config.autotuning_config.model_info_path
-        #if not path:
-        #    path = os.path.join(os.getcwd(), "autotuning_model_info.json")
-        path = '/fsx/dashiell/autotuning_model_info.json'
+        path = self._config.autotuning_config.model_info_path
+        if not path:
+            path = os.path.join(os.getcwd(), "autotuning_model_info.json")
         return path
 
     def autotuning_metric(self):
         return self._config.autotuning_config.metric
 
     def autotuning_profile_model_info(self):
-        #print(f'Autotuning enabled: {self.autotuning_enabled()}')
-        #print(f'Model info: {self._config.autotuning_config}')
-        #return self.autotuning_enabled(
-        #) and self._config.autotuning_config.model_info and self._config.autotuning_config.model_info.get(
-        #    "profile",
-        #    False)
-        return True
+        return self.autotuning_enabled(
+            ) and self._config.autotuning_config.model_info and self._config.autotuning_config.model_info.get(
+            "profile",
+            False)
 
     def sparse_gradients_enabled(self):
         return self._config.sparse_gradients_enabled
