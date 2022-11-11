@@ -901,11 +901,9 @@ class DeepSpeedEngine(Module):
             args.local_rank = self.local_rank
 
         if self.config is None:
-            print(f'#### Setting config here, config ')
             self.config = (args.deepspeed_config
                            if hasattr(args,
                                       "deepspeed_config") else None)
-        print(self.config)
         self._config = DeepSpeedConfig(self.config, mpu)
 
     # Validate command line arguments
@@ -1190,7 +1188,6 @@ class DeepSpeedEngine(Module):
         optimizer_parameters = self.optimizer_params()
         if optimizer_parameters is None:
             optimizer_parameters = {}
-        # print(optimizer_parameters.keys())
         if "max_grad_norm" in optimizer_parameters.keys():
             raise ValueError(
                 "'max_grad_norm' is not supported as an optimizer parameter, please switch to using the deepspeed parameter 'gradient_clipping' see: https://www.deepspeed.ai/docs/config-json/#gradient-clipping for more details"
@@ -1695,11 +1692,10 @@ class DeepSpeedEngine(Module):
         if self.autotuning_profile_model_info():
             activation_mem = get_ma_status() - ma
             self.autotuning_model_info["activation_mem_per_gpu"] = activation_mem
-            print(self.autotuning_model_info)
             print_json_dist(self.autotuning_model_info,
                             [0],
                             path=self.autotuning_model_info_path())
-            #exit()
+            exit()
         else:
             see_memory_usage("Engine after forward", force=self.memory_breakdown())
         return loss
