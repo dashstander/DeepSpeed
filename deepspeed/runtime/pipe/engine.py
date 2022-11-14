@@ -626,6 +626,8 @@ class PipelineEngine(DeepSpeedEngine):
         if self.batch_fn:
             batch = self.batch_fn(batch)
 
+        print(f'Batch shape: {batch.shape}')
+
         return batch
 
     def _exec_forward_pass(self, buffer_id):
