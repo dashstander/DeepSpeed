@@ -326,10 +326,12 @@ class PipelineEngine(DeepSpeedEngine):
             new_difficulty = self.curriculum_scheduler.update_difficulty( \
                 self.global_steps + 1)
             if self.global_steps == 0 or self.curriculum_scheduler.first_step:
+                print(f'Resetting activation shapes because this is the first step')
                 self.reset_activation_shape()
                 self.curriculum_scheduler.first_step = False
             elif new_difficulty != self.curriculum_scheduler.get_difficulty( \
                 self.global_steps):
+                print(f'Resetting activating shapes because difficulty changing to {new_difficulty}')
                 self.reset_activation_shape()
 
         if data_iter:
