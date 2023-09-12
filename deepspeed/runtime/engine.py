@@ -12,6 +12,8 @@ from collections import defaultdict, OrderedDict, deque
 from shutil import copyfile
 import gc
 
+import json
+
 from torch.nn.modules import Module
 from torch.nn.parameter import Parameter
 from torch.optim import Optimizer
@@ -2974,9 +2976,15 @@ class DeepSpeedEngine(Module):
         process with rank 0.
 
         """
+
         if self._optimizer_has_ckpt_event_prologue():
+            print('There is an "ckpt_event_prologue" !!!')
             # Custom preparation for checkpoint save, if applicable
             self.optimizer.checkpoint_event_prologue()
+
+        ps = self._get_zero_param_shapes()
+        with open('param_shapes_deepspeed2986.json', mode='w') as jfile:
+            json.dump(ps, jfile)
 
         rank = self.local_rank if self.use_node_local_storage() else self.global_rank
 
@@ -3009,16 +3017,28 @@ class DeepSpeedEngine(Module):
         # data parallel instances, so all procs should call _save_checkpoint.
         # All procs then call module_state_dict(), but only procs of data
         # parallel rank 0 save the general model params.
+
+        ps = self._get_zero_param_shapes()
+        with open('param_shapes_deepspeed3022.json', mode='w') as jfile:
+            json.dump(ps, jfile)
         if not self.has_moe_layers:
             self._create_checkpoint_file(save_dir, tag, False)
             self._save_checkpoint(save_dir,
                                   tag,
                                   client_state=client_state,
                                   exclude_frozen_parameters=exclude_frozen_parameters)
+        
+        ps = self._get_zero_param_shapes()
+        with open('param_shapes_deepspeed3032.json', mode='w') as jfile:
+            json.dump(ps, jfile)
 
         if self.save_zero_checkpoint:
             self._create_zero_checkpoint_files(save_dir, tag)
             self._save_zero_checkpoint(save_dir, tag)
+        
+        ps = self._get_zero_param_shapes()
+        with open('param_shapes_deepspeed3040.json', mode='w') as jfile:
+            json.dump(ps, jfile)
 
         if self._optimizer_has_ckpt_event_epilogue():
             self.optimizer.checkpoint_event_epilogue()
@@ -3175,6 +3195,7 @@ class DeepSpeedEngine(Module):
             dist.barrier(group=self.optimizer.dp_process_group)
 
         return success
+
 
     def _save_checkpoint(self, save_dir, tag, client_state={}, exclude_frozen_parameters=False):
 
