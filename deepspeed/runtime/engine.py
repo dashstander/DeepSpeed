@@ -3213,6 +3213,10 @@ class DeepSpeedEngine(Module):
         module = self.module_state_dict(exclude_frozen_parameters=exclude_frozen_parameters)
         self._curr_ckpt_path = None
 
+        ps = self._get_zero_param_shapes()
+        with open('param_shapes_deepspeed3217.json', mode='w') as jfile:
+            json.dump(ps, jfile)
+
         state = dict(module=module,
                      buffer_names=self._get_buffer_names(),
                      optimizer=self.optimizer.state_dict() if self.optimizer and not zero_optimizer_state else None,
